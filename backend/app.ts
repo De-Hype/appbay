@@ -29,8 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: "*",
-    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+    origin: ["http://localhost:5174"],
+    methods: ["5", "POST", "PATCH", "PUT", "DELETE"],
   })
 );
 sequelize.sync({ alter: true })

@@ -1,262 +1,24 @@
-// import React, { useState } from 'react';
-// import { Calendar, MoreVertical } from 'lucide-react';
-
-// const Table = () => {
-//   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-
-//   const users = [
-//     {
-//       id: '1',
-//       fullName: 'John Smith',
-//       email: 'john.smith@example.com',
-//       location: 'New York, USA',
-//       joined: '2024-01-15',
-//       permissions: 'Admin'
-//     },
-//     {
-//       id: '2',
-//       fullName: 'Sarah Johnson',
-//       email: 'sarah.j@example.com',
-//       location: 'London, UK',
-//       joined: '2024-02-01',
-//       permissions: 'Editor'
-//     },
-//     {
-//       id: '3',
-//       fullName: 'Michael Chen',
-//       email: 'michael.c@example.com',
-//       location: 'Singapore',
-//       joined: '2024-01-28',
-//       permissions: 'Viewer'
-//     },
-//     {
-//       id: '4',
-//       fullName: 'Emma Wilson',
-//       email: 'emma.w@example.com',
-//       location: 'Sydney, AU',
-//       joined: '2024-02-10',
-//       permissions: 'Editor'
-//     }
-//   ];
-
-//   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     if (e.target.checked) {
-//       setSelectedUsers(users.map(user => user.id));
-//     } else {
-//       setSelectedUsers([]);
-//     }
-//   };
-
-//   const handleSelectUser = (userId: string) => {
-//     setSelectedUsers(prev =>
-//       prev.includes(userId)
-//         ? prev.filter(id => id !== userId)
-//         : [...prev, userId]
-//     );
-//   };
-
-//   const formatDate = (dateString: string) => {
-//     return new Date(dateString).toLocaleDateString('en-US', {
-//       month: 'short',
-//       day: 'numeric',
-//       year: 'numeric'
-//     });
-//   };
-
-//   return (
-//     <div className="w-full overflow-x-auto border border-[#494949] bg-[#494949] shadow-sm">
-//       <table className="w-full min-w-full  ">
-//         <thead className="bg-[#3D3D3D]">
-//           <tr>
-//             <th scope="col" className="px-6 py-3">
-//               <input
-//                 type="checkbox"
-//                 className="h-4 w-4 rounded border-gray-300"
-//                 checked={selectedUsers.length === users.length}
-//                 onChange={handleSelectAll}
-//               />
-//             </th>
-//             <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-//               Full Name
-//             </th>
-//             <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-//               Email Address
-//             </th>
-//             <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-//               Location
-//             </th>
-//             <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-//               Joined
-//             </th>
-//             <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-//               Permissions
-//             </th>
-//             <th scope="col" className="px-6 py-3 text-right">
-//               <Calendar className="h-5 w-5 text-gray-500" />
-//             </th>
-//           </tr>
-//         </thead>
-//         <tbody className=" bg-[#494949]">
-//           {users.map((user) => (
-//             <tr
-//               key={user.id}
-//               className="hover:bg-gray-50"
-//             >
-//               <td className="px-6 py-4">
-//                 <input
-//                   type="checkbox"
-//                   className="h-4 w-4 rounded border-gray-300"
-//                   checked={selectedUsers.includes(user.id)}
-//                   onChange={() => handleSelectUser(user.id)}
-//                 />
-//               </td>
-//               <td className="px-6 py-4">
-//                 <div className="font-medium text-gray-900">{user.fullName}</div>
-//               </td>
-//               <td className="px-6 py-4 text-gray-500">
-//                 {user.email}
-//               </td>
-//               <td className="px-6 py-4 text-gray-500">
-//                 {user.location}
-//               </td>
-//               <td className="px-6 py-4 text-gray-500">
-//                 {formatDate(user.joined)}
-//               </td>
-//               <td className="px-6 py-4">
-//                 <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-//                   user.permissions === 'Admin'
-//                     ? 'bg-purple-100 text-purple-800'
-//                     : user.permissions === 'Editor'
-//                     ? 'bg-blue-100 text-blue-800'
-//                     : 'bg-gray-100 text-gray-800'
-//                 }`}>
-//                   {user.permissions}
-//                 </span>
-//               </td>
-//               <td className="px-6 py-4 text-right">
-//                 <button className="text-gray-500 hover:text-gray-700">
-//                   <MoreVertical className="h-5 w-5" />
-//                 </button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default Table;
-
 import React, { useState } from "react";
 import {
   Calendar,
   MoreVertical,
   ChevronLeft,
   ChevronRight,
+  ChevronsUpDown,
 } from "lucide-react";
 import Person from "../assets/Person.jpeg";
+import { useDispatch } from "react-redux";
+import { fetchUsers } from "../redux/userSlice";
 
-const Table = () => {
+const Table = ({tableType, data}) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(data.currentPage);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const users = [
-    {
-      id: "1",
-      fullName: "John Smith",
-      email: "john.smith@example.com",
-      location: "New York, USA",
-      joined: "2024-01-15",
-      permissions: "Admin",
-    },
-    {
-      id: "2",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "3",
-      fullName: "Michael Chen",
-      email: "michael.c@example.com",
-      location: "Singapore",
-      joined: "2024-01-28",
-      permissions: "Viewer",
-    },
-    {
-      id: "4",
-      fullName: "Emma Wilson",
-      email: "emma.w@example.com",
-      location: "Sydney, AU",
-      joined: "2024-02-10",
-      permissions: "Editor",
-    },
-    {
-      id: "5",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "6",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "7",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "8",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "9",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "10",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-    {
-      id: "11",
-      fullName: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      location: "London, UK",
-      joined: "2024-02-01",
-      permissions: "Editor",
-    },
-  ];
-
-  const totalPages = Math.ceil(users.length / rowsPerPage);
+  const totalPages = Math.ceil(data?.users.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const currentUsers = users.slice(startIndex, endIndex);
+  const currentUsers = data?.users.slice(startIndex, endIndex);
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -313,10 +75,15 @@ const Table = () => {
     }
     return pages;
   };
+  const dispatch = useDispatch();
+  const handlePageIncrement=()=>{
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+    dispatch(fetchUsers({limit:rowsPerPage, page:currentPage+1}));
+  }
 
   return (
     <div className="flex flex-col border border-[#494949] bg-[#5e5e5e] shadow-sm">
-      <div className="w-full overflow-x-auto ">
+      <div className="w-full overflow-x-auto min-h-[75vh] ">
         <table className="w-full min-w-full">
           <thead className="bg-[#3D3D3D]">
             <tr>
@@ -324,7 +91,7 @@ const Table = () => {
                 <input
                   type="checkbox"
                   className="h-4 w-4 rounded border-gray-300 border bg-[#494949] "
-                  checked={selectedUsers.length === users.length}
+                  checked={selectedUsers.length === data.users.length}
                   onChange={handleSelectAll}
                 />
               </th>
@@ -332,31 +99,61 @@ const Table = () => {
                 scope="col"
                 className="px-6 py-3 text-left text-sm font-semibold text-gray-300"
               >
-                Full Name
+                <div className="flex items-center">
+                  <span className="">Full Name</span>
+                  <span className="">
+                    <ChevronsUpDown className="" />
+                  </span>
+                </div>
+                
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-sm font-semibold text-gray-300"
               >
-                Email Address
+                <div className="flex items-center">
+                  <span className="">Email Address</span>
+                  <span className="">
+                    <ChevronsUpDown className="" />
+                  </span>
+                </div>
+                
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-sm font-semibold text-gray-300"
               >
-                Location
+                <div className="flex items-center">
+                  <span className="">Location</span>
+                  <span className="">
+                    <ChevronsUpDown className="" />
+                  </span>
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-sm font-semibold text-gray-300"
+                className="px-6 py-3 text-left flex items-center text-sm font-semibold text-gray-300"
               >
-                Joined
+                <div className="flex items-center">
+                  <span className="">Joined</span>
+                  <span className="">
+                    <ChevronsUpDown className="" />
+                  </span>
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-sm font-semibold text-gray-300"
+                style={{
+                  color: "rgba(255, 139, 55, 1)",
+                }}
+                className="px-6 py-3 text-left  text-sm font-semibold text-gray-300"
               >
-                Permissions
+                <div className="flex items-center">
+                  <span className="">Permissions</span>
+                  <span className="">
+                    <ChevronsUpDown className="text-sm" />
+                  </span>
+                </div>
               </th>
               <th scope="col" className="px-6 py-3 text-right">
                 <Calendar className="h-5 w-5 text-gray-300" />
@@ -379,24 +176,24 @@ const Table = () => {
                 </td>
                 <td className="px-6 py-4 flex items-center gap-2">
                   <img src={Person} alt="" className="w-9 h-9 rounded-full" />
-                  <p className="font-medium text-gray-300">{user.fullName}</p>
+                  <p className="font-medium text-gray-300">{user.name}</p>
                 </td>
                 <td className="px-6 py-4 text-gray-300">{user.email}</td>
                 <td className="px-6 py-4 text-gray-300">{user.location}</td>
                 <td className="px-6 py-4 text-gray-300">
-                  {formatDate(user.joined)}
+                  {formatDate(user.updatedAt)}
                 </td>
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                      user.permissions === "Admin"
+                      user.role === "Admin"
                         ? "bg-purple-100 text-purple-800"
-                        : user.permissions === "Editor"
+                        : user.role === "User"
                         ? "bg-blue-100 text-blue-800"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {user.permissions}
+                    {user.role}
                   </span>
                 </td>
                 <td className=" pl-3 pr-9 py-4 text-right">
@@ -424,7 +221,7 @@ const Table = () => {
 
           <button
             onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              handlePageIncrement
             }
             disabled={currentPage === totalPages}
             className="p-1 text-gray-300 hover:text-white disabled:text-gray-600"
