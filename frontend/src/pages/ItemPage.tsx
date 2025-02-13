@@ -31,7 +31,6 @@ const ItemPage = () => {
   const handleNewItemClick = () => {
     
     dispatch(toggleModalItem(true))
-    console.log(showModalItem, "This is it");
   };
 
   return (

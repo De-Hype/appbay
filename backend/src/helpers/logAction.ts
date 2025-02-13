@@ -11,5 +11,4 @@ export const logAction = async (
     details,
     timestamp: new Date(),
   });
-  console.log(log)
 };

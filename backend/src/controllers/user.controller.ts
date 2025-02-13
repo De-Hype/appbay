@@ -29,7 +29,6 @@ export const fetchUsersHandler = catchAsync(
     const limit = Number(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const { role, joined } = req.query;
-    console.log(role,joined)
 
     const roleFilter = role && ["admin", "user"].includes(role as string) ? { role } : {};
 
@@ -73,8 +72,6 @@ export const fetchAUserHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const user = await User.findByPk(id);
-
-    console.log(user);
 
     if (!user)
       return next(

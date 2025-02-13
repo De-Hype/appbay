@@ -59,7 +59,6 @@ const initialState: InitialStateType = {
   selectedUser: null,
 };
 
-// Create Redux slice
 const usersSlice = createSlice({
   name: "users",
   initialState,

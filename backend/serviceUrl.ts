@@ -18,13 +18,7 @@ function validateEnvVar(envVar: string | undefined, varName: string): string {
   return envVar;
 }
 
-// DB_NAME=usermanagement
-// DB_USER=postgres
-// DB_PASSWORD=yourpassword
-// DB_HOST=db  # Use 'db' when running inside Docker
-// DB_PORT=5432
-// Exporting validated environment variables
-// export const DB_URI = validateEnvVar(process.env.DB_URI, "DB_URI");
+
 export const PORT = validateEnvVar(process.env.PORT, "PORT");
 export const NODE_ENV = validateEnvVar(process.env.NODE_ENV, "NODE_ENV");
 export const DB_NAME = validateEnvVar(process.env.DB_NAME, "DB_NAME");
