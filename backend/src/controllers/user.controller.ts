@@ -22,13 +22,63 @@ export const createUserHandler = catchAsync(
     return AppResponse(res, "User created successfully", 201, newUser);
   }
 );
+// export const fetchUsersHandler = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const page = Number(req.query.page) || 1;
+//     const limit = Number(req.query.limit) || 10;
+//     const offset = (page - 1) * limit;
+
+//     const { count, rows: users } = await User.findAndCountAll({
+//       limit,
+//       offset,
+//       order: [["createdAt", "DESC"]],
+//     });
+
+//     if (!users.length) return next(new AppError("No users found", 404));
+
+//     return AppResponse(res, "Users fetched successfully", 200, {
+//       users,
+//       totalUsers: count,
+//       currentPage: page,
+//       totalPages: Math.ceil(count / limit),
+//     });
+//   }
+// );
+
+
 export const fetchUsersHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const { role, joined } = req.query;
+    console.log(role,joined)
 
+    // Role filter: Only allow 'admin' or 'user', otherwise fetch all
+    const roleFilter = role && ["admin", "user"].includes(role as string) ? { role } : {};
+
+    // Joined filter: Get users who joined yesterday or last week
+    let dateFilter = {};
+    if (joined === "yesterday") {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(0, 0, 0, 0);
+
+      dateFilter = { createdAt: { $gte: yesterday } };
+    } else if (joined === "lastWeek") {
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      lastWeek.setHours(0, 0, 0, 0);
+
+      dateFilter = { createdAt: { $gte: lastWeek } };
+    }
+
+    // Fetch users based on filters
     const { count, rows: users } = await User.findAndCountAll({
+      where: {
+        ...roleFilter,
+        ...dateFilter,
+      },
       limit,
       offset,
       order: [["createdAt", "DESC"]],

@@ -2,19 +2,17 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { BaseURL } from "../utils";
 
-export const fetchUsers = createAsyncThunk(
-  "users/fetchUsers",
+export const fetchItems = createAsyncThunk(
+  "items/fetchItems",
   async (
     {
       page = 1,
       limit = 10,
-      role,
-      joined,
+      
     }: {
       page: number;
       limit: number;
-      role?: string;
-      joined?: string;
+     
     },
     { rejectWithValue }
   ) => {
@@ -23,10 +21,7 @@ export const fetchUsers = createAsyncThunk(
       params.append("page", page.toString());
       params.append("limit", limit.toString());
 
-      if (role) params.append("role", role);
-      if (joined) params.append("joined", joined);
-
-      const response = await axios.get(`${BaseURL}/users?${params.toString()}`);
+      const response = await axios.get(`${BaseURL}/items?${params.toString()}`);
       return response.data; 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -34,63 +29,61 @@ export const fetchUsers = createAsyncThunk(
     }
   }
 );
-export type User = {
+export type Item = {
   id: number;
-  name: string;
-  email: string;
-  role: string;
-  location: string;
+  name:string;
+  description:string;
+  price:number;
   createdAt: string;
   updatedAt: string;
 };
 
 type InitialStateType = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  users: any; 
+  items: any; 
   loading: boolean;
   error: string | null;
-  selectedUser: User | null;
+  selectedItem: Item | null;
 };
 
 const initialState: InitialStateType = {
-  users: [],
+  items: [],
   error: null,
   loading: false,
-  selectedUser: null,
+  selectedItem: null,
 };
 
-// Create Redux slice
-const usersSlice = createSlice({
-  name: "users",
+const itemsSlice = createSlice({
+  name: "items",
   initialState,
 
   reducers: {
-    setSelectedUser: (state, action: PayloadAction<User>) => {
-      state.selectedUser = action.payload;
+    setSelectedItem: (state, action: PayloadAction<Item>) => {
+      state.selectedItem = action.payload;
     },
-    updateUser: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.selectedUser) {
-        state.selectedUser = { ...state.selectedUser, ...action.payload };
+    updateItem: (state, action: PayloadAction<Partial<Item>>) => {
+      if (state.selectedItem) {
+        state.selectedItem = { ...state.selectedItem, ...action.payload };
       }
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUsers.pending, (state) => {
+      .addCase(fetchItems.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUsers.fulfilled, (state, action) => {
+      .addCase(fetchItems.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.users = action.payload.data; 
+        state.items = action.payload.data; 
       })
-      .addCase(fetchUsers.rejected, (state, action) => {
+      .addCase(fetchItems.rejected, (state, action) => {
         state.loading = false;
-        state.users = [];
+        state.items = [];
         state.error = action.payload as string; 
       });
   },
 });
-export const { setSelectedUser, updateUser } = usersSlice.actions;
-export default usersSlice.reducer;
+export const { setSelectedItem, updateItem } = itemsSlice.actions;
+export default itemsSlice.reducer;

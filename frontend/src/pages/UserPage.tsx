@@ -3,36 +3,58 @@ import GradientBackground from "../Components/GradientBackground";
 import GroupIcon from "../assets/GroupIcon.svg";
 import { EllipsisVertical } from "lucide-react";
 import Table from "../Components/Table";
-import { BaseURL } from "../utils";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../redux/userSlice";
 import { RootState } from "../redux/store";
 import Loader from "../Components/Loader";
+import DetailsModal from "../Components/DetailsModal";
+import { toggleModal } from "../redux/actionSlice";
 
-const roles = ["User", "Admin"];
-const joinPeriod = ["Anytime", "Yesterday", "Last week"];
+const roles = [
+  { text: "all", title: "All" },
+  { text: "admin", title: "Admin" },
+  { text: "user", title: "User" },
+];
+const joinPeriod = [
+  { text: "anyTime", title: "Anytime" },
+  { text: "yesterday", title: "Yesterday" },
+  { text: "lastWeek", title: "Last Week" },
+];
+
 const UserPage = () => {
-  const [selectedRole, setSelectedRole] = useState("User");
+  const [selectedRole, setSelectedRole] = useState(roles[2].title);
   const [selectedJoinDate, setselectedJoinDate] = useState("Anytime");
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector(
     (state: RootState) => state.users
   );
   useEffect(() => {
-    dispatch(fetchUsers({limit:10, page:1}));
-  }, [dispatch]);
-  console.log(users, "This is the users");
+    dispatch(
+      fetchUsers({
+        limit: 10,
+        page: 1,
+        joined: selectedJoinDate,
+        role: selectedRole,
+      })
+    );
+  }, [dispatch, selectedJoinDate, selectedRole]);
+  const { showModalUser } = useSelector((state: RootState) => state.actions);
+  const { selectedUser } = useSelector((state: RootState) => state.users);
+
+  const handleNewUserClick = () => {
+    dispatch(toggleModal(true));
+  };
+
   return (
     <GradientBackground>
       {loading && (
         <div className="max-h-screen max-w-screen h-screen w-screen flex items-center justify-center">
           <Loader />
         </div>
-      ) }
-      
-      {users?.users?.length >=1  && (
-        <div className="px-5 w-[90%] py-6">
+      )}
+
+      {!loading && (
+        <div className="px-5 w-[90%] py-6 relative">
           <div className="flex flex-col gap-3.5 mb-8">
             <div className="">
               <h2 className="text-[#fff] font-normal text-2xl">
@@ -60,8 +82,8 @@ const UserPage = () => {
                       className="w-full rounded-md p-2  "
                     >
                       {roles.map((role) => (
-                        <option key={role} value={role}>
-                          {role}
+                        <option key={role.text} value={role.text}>
+                          {role.title}
                         </option>
                       ))}
                     </select>
@@ -79,8 +101,8 @@ const UserPage = () => {
                       className="w-full rounded-md p-2  "
                     >
                       {joinPeriod.map((role) => (
-                        <option key={role} value={role}>
-                          {role}
+                        <option key={role.text} value={role.text}>
+                          {role.title}
                         </option>
                       ))}
                     </select>
@@ -105,8 +127,9 @@ const UserPage = () => {
                   Export
                 </button>
                 <button
+                  onClick={handleNewUserClick}
                   type="button"
-                  className="border bg-[#FB6B03] px-4 py-3 font-bold border-[#6B6B6B] text-[#FFFFFF]  text-sm flex gap-2 items-center"
+                  className="border bg-[#FB6B03] cursor-pointer px-4 py-3 font-bold border-[#6B6B6B] text-[#FFFFFF]  text-sm flex gap-2 items-center"
                 >
                   <span className="">+</span>
                   <span className="">New User</span>
@@ -115,10 +138,24 @@ const UserPage = () => {
             </div>
           </div>
           <div className="bg-[#494949]">
-            <div className="bg-[#3D3D3D]"></div>
-            <div className=""></div>
-            <Table tableType="user" data={users}/>
+            {!error && users?.users?.length >= 1 && (
+              <Table
+                joinDate={selectedJoinDate}
+                selectRole={selectedRole}
+                tableType="user"
+                data={users}
+              />
+            )}
+            {error && (
+              <div className="min-h-[75vh] flex items-center justify-center">
+                <p className="text-white">{error.message}</p>
+              </div>
+            )}
           </div>
+
+          {showModalUser && !selectedUser && (
+            <DetailsModal isType="user" usedFor="create" />
+          )}
         </div>
       )}
     </GradientBackground>

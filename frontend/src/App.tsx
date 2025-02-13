@@ -9,8 +9,7 @@ function App() {
       <div className="helvetica-neue">
         <Routes>
           <Route path="/users" element={<UserPage />} />
-          <Route path="/item" element={<ItemPage />} />
-          {/* <Route path="/users/:id" element={<UserDetail />} /> */}
+          <Route path="/items" element={<ItemPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
